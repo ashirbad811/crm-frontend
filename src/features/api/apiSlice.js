@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { logout } from '../auth/authSlice';
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: 'http://localhost:5000/api', 
+  baseUrl: 'https://crm-backend-ku7v.onrender.com/api', 
   prepareHeaders: (headers) => {
     const userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
     if (userInfo && userInfo.token) {
