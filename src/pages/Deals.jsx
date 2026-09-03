@@ -2,10 +2,12 @@ import { useGetDealsQuery, useUpdateDealMutation } from '../features/api/dealsAp
 import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { X } from 'lucide-react';
+import { useRBAC } from '../hooks/useRBAC';
 
 const STAGES = ['Qualification', 'Discovery', 'Proposal', 'Negotiation', 'Won', 'Lost'];
 
 const Deals = () => {
+  const { hasPermission } = useRBAC();
   const { data, isLoading, error } = useGetDealsQuery({ limit: 100 });
   const [updateDeal] = useUpdateDealMutation();
 
@@ -80,7 +82,7 @@ const Deals = () => {
                   </span>
                 </div>
                 <div className="text-sm text-gray-500 font-medium">
-                  ${stageTotal.toLocaleString()}
+                  ₹{stageTotal.toLocaleString()}
                 </div>
               </div>
               
@@ -92,19 +94,24 @@ const Deals = () => {
                     
                     <div className="flex justify-between items-end">
                       <div>
-                        <div className="text-sm font-bold text-gray-900">${deal.value.toLocaleString()}</div>
+                        <div className="text-sm font-bold text-gray-900">₹{deal.value.toLocaleString()}</div>
                         <div className="text-xs text-green-600 font-medium">{deal.probability}% win prob</div>
                       </div>
-                      
-                      <select 
-                        className="text-xs border border-gray-300 rounded p-1"
-                        value={deal.stage}
-                        onChange={(e) => handleStageChange(deal, e.target.value)}
-                      >
-                        {STAGES.map(s => (
-                          <option key={s} value={s}>{s}</option>
-                        ))}
-                      </select>
+                      {hasPermission('Deals', 'Edit') ? (
+                        <select 
+                          className="text-xs border border-gray-300 rounded p-1"
+                          value={deal.stage}
+                          onChange={(e) => handleStageChange(deal, e.target.value)}
+                        >
+                          {STAGES.map(s => (
+                            <option key={s} value={s}>{s}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <div className="text-xs font-semibold text-gray-700 bg-gray-100 px-2 py-1 rounded border border-gray-200">
+                          {deal.stage}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}

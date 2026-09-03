@@ -2,7 +2,7 @@ import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../features/auth/authSlice';
 import { useGetNotificationsQuery, useMarkAsReadMutation, useMarkAllAsReadMutation } from '../features/api/notificationsApiSlice';
-import { LayoutDashboard, Users, UserPlus, Briefcase, Activity, LogOut, Bell, CheckCircle, Shield } from 'lucide-react';
+import { LayoutDashboard, Users, UserPlus, Briefcase, Activity, LogOut, Bell, CheckCircle, Shield, List } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useSocket } from '../context/SocketContext';
 import { toast } from 'react-toastify';
@@ -23,10 +23,6 @@ const Layout = () => {
   useEffect(() => {
     if (socket) {
       socket.on('newNotification', (notification) => {
-        toast.info(notification.message, {
-          position: "bottom-right",
-          autoClose: 5000,
-        });
         // Invalidate tags to trigger a refetch of notifications
         dispatch(apiSlice.util.invalidateTags(['Notification']));
       });
@@ -56,6 +52,7 @@ const Layout = () => {
   if (hasPermission('Customers', 'View')) navItems.push({ name: 'Customers', path: '/customers', icon: Users });
   if (hasPermission('Deals', 'View')) navItems.push({ name: 'Deals', path: '/deals', icon: Briefcase });
   if (hasPermission('Activities', 'View')) navItems.push({ name: 'Activities', path: '/activities', icon: Activity });
+  if (hasPermission('Dashboard', 'View')) navItems.push({ name: 'System Logs', path: '/system-logs', icon: List });
   if (hasPermission('Users', 'View')) navItems.push({ name: 'Users', path: '/users', icon: Users });
   if (hasPermission('Roles', 'View')) navItems.push({ name: 'Roles', path: '/roles', icon: Shield });
 
@@ -64,7 +61,7 @@ const Layout = () => {
       {/* Sidebar (Desktop) */}
       <div className="hidden md:flex w-64 bg-white border-r border-gray-200 flex-col">
         <div className="p-6 border-b border-gray-200">
-          <h1 className="text-2xl font-bold text-blue-600">CRM Pro</h1>
+          <h1 className="text-2xl font-bold text-blue-600">Lead Management System</h1>
         </div>
         
         <nav className="flex-1 p-4 space-y-1">

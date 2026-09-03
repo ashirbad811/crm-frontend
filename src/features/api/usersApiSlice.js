@@ -20,6 +20,10 @@ export const usersApiSlice = apiSlice.injectEndpoints({
       query: () => '/users',
       providesTags: ['User'],
     }),
+    getAssignableUsers: builder.query({
+      query: () => '/users/assignable',
+      providesTags: ['User'],
+    }),
     createUser: builder.mutation({
       query: (data) => ({
         url: '/users',
@@ -46,4 +50,4 @@ export const usersApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useGetUsersQuery, useCreateUserMutation, useDeleteUserMutation, useUpdateUserMutation } = usersApiSlice;
+export const { useLoginMutation, useRegisterMutation, useGetUsersQuery, useGetAssignableUsersQuery, useCreateUserMutation, useDeleteUserMutation, useUpdateUserMutation } = usersApiSlice;

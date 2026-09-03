@@ -17,10 +17,19 @@ export const activitiesApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error, { id }) => [{ type: 'Activity', id }, 'Activity', 'Dashboard'],
     }),
+    createActivity: builder.mutation({
+      query: (data) => ({
+        url: '/activities',
+        method: 'POST',
+        body: data,
+      }),
+      invalidatesTags: ['Activity', 'Dashboard'],
+    }),
   }),
 });
 
 export const {
   useGetActivitiesQuery,
   useUpdateActivityMutation,
+  useCreateActivityMutation,
 } = activitiesApiSlice;

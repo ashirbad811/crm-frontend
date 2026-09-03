@@ -10,6 +10,7 @@ import Leads from './pages/Leads';
 import Customers from './pages/Customers';
 import Deals from './pages/Deals';
 import Activities from './pages/Activities';
+import SystemLogs from './pages/SystemLogs';
 
 import Users from './pages/Users';
 import Roles from './pages/Roles';
@@ -29,6 +30,7 @@ function App() {
             <Route path="customers" element={<Customers />} />
             <Route path="deals" element={<Deals />} />
             <Route path="activities" element={<Activities />} />
+            <Route path="system-logs" element={<SystemLogs />} />
             <Route path="users" element={<Users />} />
             <Route path="roles" element={<Roles />} />
           </Route>

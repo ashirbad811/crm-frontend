@@ -1,9 +1,19 @@
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useGetDashboardStatsQuery } from '../features/api/analyticsApiSlice';
-import { Users, UserPlus, Briefcase, DollarSign, Activity } from 'lucide-react';
+import { useGetGlobalLogsQuery } from '../features/api/timelineApiSlice';
+import { useGetAssignableUsersQuery } from '../features/api/usersApiSlice';
+import { Users, UserPlus, Briefcase, IndianRupee, Activity, List, Clock, ChevronRight } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
 const Dashboard = () => {
+  const [selectedUserId, setSelectedUserId] = useState('');
+  
   const { data: stats, isLoading, error } = useGetDashboardStatsQuery();
+  const { data: logs, isLoading: logsLoading } = useGetGlobalLogsQuery(
+    selectedUserId ? { userId: selectedUserId } : {}
+  );
+  const { data: teamUsers } = useGetAssignableUsersQuery();
 
   if (isLoading) return <div className="flex justify-center items-center h-64">Loading dashboard...</div>;
   if (error) return <div className="text-red-500">Error loading dashboard: {error.message}</div>;
@@ -49,7 +59,7 @@ const Dashboard = () => {
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-start justify-between">
           <div>
             <p className="text-sm font-medium text-gray-500">Pipeline Value</p>
-            <h3 className="text-3xl font-bold text-gray-900 mt-2">${(stats?.deals.pipelineValue || 0).toLocaleString()}</h3>
+            <h3 className="text-3xl font-bold text-gray-900 mt-2">₹{(stats?.deals.pipelineValue || 0).toLocaleString()}</h3>
             <p className="text-xs text-blue-600 mt-2 font-medium">{stats?.deals.open || 0} Open Deals</p>
           </div>
           <div className="bg-purple-50 p-3 rounded-lg">
@@ -61,11 +71,11 @@ const Dashboard = () => {
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-start justify-between">
           <div>
             <p className="text-sm font-medium text-gray-500">Won Revenue</p>
-            <h3 className="text-3xl font-bold text-gray-900 mt-2">${(stats?.deals.wonRevenue || 0).toLocaleString()}</h3>
+            <h3 className="text-3xl font-bold text-gray-900 mt-2">₹{(stats?.deals.wonRevenue || 0).toLocaleString()}</h3>
             <p className="text-xs text-green-600 mt-2 font-medium">{stats?.deals.won || 0} Won Deals</p>
           </div>
           <div className="bg-green-50 p-3 rounded-lg">
-            <DollarSign className="w-6 h-6 text-green-600" />
+            <IndianRupee className="w-6 h-6 text-green-600" />
           </div>
         </div>
       </div>
@@ -127,6 +137,64 @@ const Dashboard = () => {
                <div className="text-xs font-medium text-red-600 mt-1 uppercase">Overdue</div>
              </div>
           </div>
+        </div>
+      </div>
+
+      {/* System Logs */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mt-8 overflow-hidden">
+        <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex items-center space-x-2">
+            <List className="text-gray-400 w-5 h-5" />
+            <h3 className="text-lg font-bold text-gray-900">System Logs</h3>
+          </div>
+          
+          {/* Filter Dropdown */}
+          {teamUsers && teamUsers.length > 0 && (
+            <select
+              className="text-sm border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 py-2 px-3 border shadow-sm"
+              value={selectedUserId}
+              onChange={(e) => setSelectedUserId(e.target.value)}
+            >
+              <option value="">All Team Logs</option>
+              {teamUsers.map(u => (
+                <option key={u._id} value={u._id}>{u.name} ({u.email})</option>
+              ))}
+            </select>
+          )}
+        </div>
+        
+        <div className="p-0">
+          {logsLoading ? (
+            <div className="p-6 text-center text-gray-500">Loading logs...</div>
+          ) : logs && logs.length > 0 ? (
+            <ul className="divide-y divide-gray-100">
+              {logs.slice(0, 5).map(log => (
+                <li key={log._id} className="p-4 hover:bg-gray-50 transition">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">{log.action}</p>
+                      <p className="text-sm text-gray-600 mt-0.5">{log.description}</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded inline-block">{log.onModel}</p>
+                    </div>
+                  </div>
+                  <div className="mt-2 flex items-center space-x-3 text-xs text-gray-400">
+                    <span className="flex items-center"><Clock className="w-3 h-3 mr-1"/> {new Date(log.createdAt).toLocaleString()}</span>
+                    <span>•</span>
+                    <span>By: {log.createdBy?.name || 'Unknown'}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="p-6 text-center text-gray-500">No logs found.</div>
+          )}
+        </div>
+        <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-center">
+          <Link to="/system-logs" className="text-sm font-semibold text-blue-600 hover:text-blue-800 flex items-center transition">
+            View All Logs <ChevronRight className="w-4 h-4 ml-1" />
+          </Link>
         </div>
       </div>
     </div>
